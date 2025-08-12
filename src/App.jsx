@@ -10,6 +10,7 @@ import Documents from './pages/Documents'
 import Chat from './pages/Chat'
 import Search from './pages/Search'
 import Analytics from './pages/Analytics'
+import Profile from './pages/Profile'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -31,6 +32,7 @@ return (
             <Route path="chat" element={<Chat />} />
             <Route path="search" element={<Search />} />
             <Route path="analytics" element={<Analytics />} />
+            <Route path="profile" element={<Profile />} />
             </Route>
         </Routes>
         </div>
