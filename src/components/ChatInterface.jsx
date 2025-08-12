@@ -56,6 +56,10 @@ const ChatInterface = ({ session, messages, onSendMessage, loading, sending }) =
     )
   }
 
+  const hasStreamingPlaceholder = messages?.some(
+    (m) => m.role === 'assistant' && (!m.content || m.content.length === 0)
+  )
+
   return (
     <div className="flex-1 flex flex-col h-full">
       {/* Chat Header */}
@@ -85,7 +89,7 @@ const ChatInterface = ({ session, messages, onSendMessage, loading, sending }) =
             {messages.map((message, index) => (
               <MessageBubble key={message.id || index} message={message} />
             ))}
-            {sending && (
+            {sending && !hasStreamingPlaceholder && (
               <div className="flex items-start space-x-3">
                 <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
                   <CpuChipIcon className="h-5 w-5 text-primary-600" />
@@ -93,7 +97,7 @@ const ChatInterface = ({ session, messages, onSendMessage, loading, sending }) =
                 <div className="bg-white rounded-lg px-4 py-3 max-w-3xl">
                   <div className="flex items-center space-x-2">
                     <LoadingSpinner size="small" />
-                    <span className="text-sm text-gray-500">Thinking...</span>
+                    <span className="text-sm text-gray-500">...</span>
                   </div>
                 </div>
               </div>
