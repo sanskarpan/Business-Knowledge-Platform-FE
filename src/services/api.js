@@ -119,7 +119,10 @@ export const searchAPI = {
     const params = {
       q: query,
       limit: options.limit || 10,
-      search_type: options.searchType || 'hybrid'
+      search_type: options.searchType || 'hybrid',
+      file_type: options.fileType,
+      date_from: options.dateFrom,
+      date_to: options.dateTo,
     }
     return api.get('/api/search', { params })
   },
