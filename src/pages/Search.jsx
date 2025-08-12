@@ -7,11 +7,14 @@ const Search = () => {
   const { results, loading, query, search, clearResults } = useSearch()
   const [searchInput, setSearchInput] = useState('')
   const [searchType, setSearchType] = useState('hybrid')
+  const [fileType, setFileType] = useState('')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
 
   const handleSearch = (e) => {
     e.preventDefault()
     if (searchInput.trim()) {
-      search(searchInput.trim(), { searchType })
+      search(searchInput.trim(), { searchType, fileType: fileType || undefined, dateFrom: dateFrom || undefined, dateTo: dateTo || undefined })
     }
   }
 
@@ -41,7 +44,7 @@ const Search = () => {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Search Type
@@ -56,7 +59,26 @@ const Search = () => {
                 <option value="semantic">Semantic Search</option>
               </select>
             </div>
-            <div className="flex items-end space-x-2">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">File Type</label>
+              <select className="input-field" value={fileType} onChange={(e) => setFileType(e.target.value)}>
+                <option value="">All</option>
+                <option value="pdf">PDF</option>
+                <option value="word">Word</option>
+                <option value="text">Text/Markdown</option>
+                <option value="image">Image</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">From</label>
+              <input type="date" className="input-field" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">To</label>
+              <input type="date" className="input-field" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+            </div>
+            <div className="flex items-end space-x-2 col-span-full sm:col-span-2 lg:col-span-1">
               <button
                 type="submit"
                 disabled={!searchInput.trim() || loading}
