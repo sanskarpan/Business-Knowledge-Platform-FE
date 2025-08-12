@@ -62,6 +62,19 @@ export const useChat = () => {
     setMessages(prev => [...prev, userMessage])
 
     try {
+      // Prepare a placeholder assistant message for streaming updates
+      const aiTempId = Date.now() + 1
+      setMessages(prev => [
+        ...prev,
+        {
+          id: aiTempId,
+          role: 'assistant',
+          content: '',
+          sources: [],
+          timestamp: new Date().toISOString(),
+        },
+      ])
+
       // Try streaming endpoint first
       const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000'
       const resp = await fetch(`${apiBase}/api/chat/sessions/${currentSession.id}/stream`, {
@@ -77,7 +90,6 @@ export const useChat = () => {
         const reader = resp.body.getReader()
         const decoder = new TextDecoder('utf-8')
         let buffer = ''
-        let collected = ''
         let sources = []
 
         while (true) {
@@ -95,8 +107,8 @@ export const useChat = () => {
             try {
               const evt = JSON.parse(payload)
               if (evt.type === 'token') {
-                collected += evt.content
-                setMessages(prev => prev.map(m => m.id === userMessage.id ? m : m))
+                const token = evt.content || ''
+                setMessages(prev => prev.map(m => m.id === aiTempId ? { ...m, content: (m.content || '') + token } : m))
               } else if (evt.type === 'end') {
                 sources = evt.sources || []
               }
@@ -104,14 +116,8 @@ export const useChat = () => {
           }
         }
 
-        const aiMessage = {
-          id: Date.now() + 1,
-          role: 'assistant',
-          content: collected.trim() || '...',
-          sources,
-          timestamp: new Date().toISOString()
-        }
-        setMessages(prev => [...prev, aiMessage])
+        // Finalize sources on the placeholder message
+        setMessages(prev => prev.map(m => m.id === aiTempId ? { ...m, sources } : m))
       } else {
         // Fallback to non-streaming endpoint
         const response = await chatAPI.sendMessage(currentSession.id, content)
@@ -119,21 +125,15 @@ export const useChat = () => {
         const sources = Array.isArray(rawSources)
           ? rawSources
           : (typeof rawSources === 'string' ? (() => { try { return JSON.parse(rawSources) } catch { return [] } })() : [])
-        const aiMessage = {
-          id: Date.now() + 1,
-          role: 'assistant',
-          content: response.data.message,
-          sources,
-          timestamp: new Date().toISOString()
-        }
-        setMessages(prev => [...prev, aiMessage])
+        // Set the placeholder content to full response
+        setMessages(prev => prev.map(m => m.id === aiTempId ? { ...m, content: response.data.message, sources } : m))
       }
     } catch (error) {
       toast.error('Failed to send message')
       console.error('Error sending message:', error)
       
-      // Remove user message on error
-      setMessages(prev => prev.filter(msg => msg.id !== userMessage.id))
+      // Remove placeholder assistant message on error
+      setMessages(prev => prev.filter(msg => !(msg.role === 'assistant' && msg.content === '')))
     } finally {
       setSending(false)
     }
