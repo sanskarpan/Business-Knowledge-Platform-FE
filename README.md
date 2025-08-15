@@ -221,9 +221,9 @@ The application supports modern browsers with ES6+ support:
 
 ## Deployment
 
-The application has been deployed to [Vercel](https://business-knowledge-platform-fe.vercel.app/login) currenty, and can be deployed on following as well:
+The application has been deployed to [Vercel](https://business-knowledge-platform-fe.vercel.app) currenty, and can be deployed on following as well:
 
-- **Static Hosting**: Netlify, Vercel, GitHub Pages
+- **Static Hosting**: Netlify, GitHub Pages
 - **Cloud Platforms**: AWS S3, Google Cloud Storage
 - **Container Platforms**: Docker, Kubernetes
 - **Traditional Hosting**: Apache, Nginx
